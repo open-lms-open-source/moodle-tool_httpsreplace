@@ -31,7 +31,7 @@ require_once("$CFG->libdir/formslib.php");
  */
 class tool_httpsreplace_form extends moodleform {
 
-    function definition() {
+    public function definition() {
         global $CFG, $DB;
 
         $mform = $this->_form;

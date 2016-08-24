@@ -42,40 +42,48 @@ if (!$DB->replace_all_text_supported()) {
 
 echo $OUTPUT->box_start();
 echo $OUTPUT->notification(get_string('notsupported', 'tool_httpsreplace'));
-echo $OUTPUT->notification(get_string('excludedtables', 'tool_httpsreplace'));
 echo $OUTPUT->box_end();
 
 
 $form = new tool_httpsreplace_form();
 
 if (!$data = $form->get_data()) {
+
     $finder = new \tool_httpsreplace\url_finder();
     $results = $finder->http_link_stats();
 
-    echo '<h2>'.get_string('domainexplain', 'tool_httpsreplace').'</h2>';
+    echo '<p>'.get_string('domainexplain', 'tool_httpsreplace').'</p>';
+    echo page_doc_link(get_string('doclink', 'tool_httpsreplace'));
     if (empty($results)) {
         echo get_string('allclear', 'tool_httpsreplace');
     } else {
-        echo '<p>'.get_string('domainexplainhelp', 'tool_httpsreplace').'</p>';
         arsort($results);
+        $table = new html_table();
+        $table->id = 'plugins-check';
+        $table->head = array(
+            get_string('domain', 'tool_httpsreplace'),
+            get_string('count', 'tool_httpsreplace'),
+        );
+        $data = array();
         foreach ($results as $domain => $count) {
-            echo $domain . ' ' . $count . "<br>";
+            $data[] = [$domain, $count];
         }
+        $table->data = $data;
+        echo html_writer::table($table);
     }
     $form->display();
-    echo $OUTPUT->footer();
-    die();
+} else {
+    // Scroll to the end when finished.
+    $PAGE->requires->js_init_code("window.scrollTo(0, 5000000);");
+
+    echo '<p>'.get_string('replacing', 'tool_httpsreplace').'</p>';
+
+    echo $OUTPUT->box_start();
+    $replace = new \tool_httpsreplace\url_replace();
+    $replace->upgrade_http_links();
+    echo $OUTPUT->box_end();
+
+    echo $OUTPUT->continue_button(new moodle_url('/admin/index.php'));
+
 }
-
-// Scroll to the end when finished.
-$PAGE->requires->js_init_code("window.scrollTo(0, 5000000);");
-
-echo $OUTPUT->box_start();
-$replace = new \tool_httpsreplace\url_replace();
-$replace->upgrade_http_links();
-echo $OUTPUT->box_end();
-
-echo '<p>'.get_string('replacing', 'tool_httpsreplace').'</p>';
-echo $OUTPUT->continue_button(new moodle_url('/admin/index.php'));
-
 echo $OUTPUT->footer();
