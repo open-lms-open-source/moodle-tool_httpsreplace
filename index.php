@@ -41,21 +41,21 @@ if (!$DB->replace_all_text_supported()) {
 }
 
 echo $OUTPUT->box_start();
-echo $OUTPUT->notification(get_string('notsupported', 'tool_httpsreplace'));
+echo $OUTPUT->notification(get_string('takeabackupwarning', 'tool_httpsreplace'));
 echo $OUTPUT->box_end();
 
 
-$form = new tool_httpsreplace_form();
+$form = new \tool_httpsreplace\form();
 
+$finder = new \tool_httpsreplace\url_finder();
 if (!$data = $form->get_data()) {
 
-    $finder = new \tool_httpsreplace\url_finder();
     $results = $finder->http_link_stats();
 
     echo '<p>'.get_string('domainexplain', 'tool_httpsreplace').'</p>';
-    echo page_doc_link(get_string('doclink', 'tool_httpsreplace'));
+    echo '<p>'.page_doc_link(get_string('doclink', 'tool_httpsreplace')).'</p>';
     if (empty($results)) {
-        echo get_string('allclear', 'tool_httpsreplace');
+        echo '<p>'.get_string('oktoprocede', 'tool_httpsreplace').'</p>';
     } else {
         arsort($results);
         $table = new html_table();
@@ -79,8 +79,7 @@ if (!$data = $form->get_data()) {
     echo '<p>'.get_string('replacing', 'tool_httpsreplace').'</p>';
 
     echo $OUTPUT->box_start();
-    $replace = new \tool_httpsreplace\url_replace();
-    $replace->upgrade_http_links();
+    $finder->upgrade_http_links();
     echo $OUTPUT->box_end();
 
     echo $OUTPUT->continue_button(new moodle_url('/admin/index.php'));

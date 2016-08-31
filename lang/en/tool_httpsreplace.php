@@ -23,20 +23,19 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-$string['allclear'] = 'No content included from domains that are incompatible with https. If you are ready to switch to using https then you can proceed.';
 $string['count'] = 'Number of links';
 $string['disclaimer'] = 'I understand the risks of this operation';
 $string['doclink'] = 'Read more documentation on the wiki';
 $string['doit'] = 'Yes, do it!';
 $string['domain'] = 'Problematic domain';
-$string['domainexplain'] = 'This tool locates embedded content that may not work when upgrading a site to use https, and allows you to fix the problems automatically.';
-$string['domainexplainhelp'] = 'These domains are found in your content, but do not appear to support https links. After switching to https, the content included from these sites will no longer display within Moodle for users with secure modern browsers. It is possible that these sites are temporarily or permanently unavailable and so will not work with either security setting. After reviewing these results you may still wish to proceed if you consider this externally hosted content non-essential.';
-$string['excludedtables'] = 'For greater speed, only tables and columns likely to contain links are updated by this tool, so some links may be missed.';
+$string['domainexplain'] = 'This tool locates embedded content that may not work when upgrading a site to use https. It also allows you to fix the problems automatically.';
+$string['domainexplainhelp'] = 'These domains are found in your content, but do not appear to support https links. After switching to https, the content included from these sites will no longer display within Moodle for users with secure modern browsers. It is possible that these sites are temporarily or permanently unavailable and will not work with either security setting. Proceed only after reviewing these results and determining if this externally hosted content is non-essential.';
 $string['invalidcharacter'] = 'Invalid characters were found in the search or replace text.';
 $string['notifyfinished'] = '...finished';
 $string['notifyrebuilding'] = 'Rebuilding course cache...';
 $string['notimplemented'] = 'Sorry, this feature is not implemented in your database driver.';
-$string['notsupported'] = 'Changes made cannot be reverted, thus a complete backup should be made before running this script!';
+$string['oktoprocede'] = 'The scan finds no issues with your content. You can proceed to upgrade any http links to use https.';
 $string['pageheader'] = 'Upgrade externally hosted content urls to https';
 $string['pluginname'] = 'HTTPS Replace';
 $string['replacing'] = 'Replacing http links with https...';
+$string['takeabackupwarning'] = 'Changes made can\'t be reverted. A complete backup should be made before running this script!';

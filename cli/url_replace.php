@@ -33,5 +33,5 @@ Example:
     exit(0);
 }
 
-$urlreplace = new \local_mrooms\url_replace();
-$results = $urlreplace->upgrade_http_links();
+$urlfinder = new \tool_httpsreplace\url_finder();
+$urlfinder->upgrade_http_links();

@@ -33,7 +33,7 @@ Example:
     exit(0);
 }
 
-$urlfinder = new \local_mrooms\url_finder();
+$urlfinder = new \tool_httpsreplace\url_finder();
 $results = $urlfinder->http_link_stats();
 $fp = fopen('php://stdout', 'w');
 fputcsv($fp, ['clientsite', 'httpdomain', 'urlcount']);

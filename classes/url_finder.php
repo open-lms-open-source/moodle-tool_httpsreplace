@@ -25,15 +25,23 @@ namespace tool_httpsreplace;
  */
 class url_finder {
 
+    public function http_link_stats() {
+        return $this->process(false);
+    }
+
+    public function upgrade_http_links() {
+        return $this->process(true);
+    }
+
     /**
      * Originally forked from core function db_search().
      */
-    public function http_link_stats() {
+    private function process($replacing = false) {
         global $DB, $CFG;
 
         require_once($CFG->libdir.'/filelib.php');
 
-        $search  = "(src|data)\ *=\ *[\\\"\']http://";
+        $httpurls  = "(src|data)\ *=\ *[\\\"\']http://";
 
         // TODO: block_instances have HTML content as base64, need to decode then
         // search, currently just skipped.
@@ -69,6 +77,7 @@ class url_finder {
             'longtext',
             'varchar',
         );
+
         foreach ($tables as $table) {
             if (in_array($table, $skiptables)) {
                 continue;
@@ -80,8 +89,9 @@ class url_finder {
                     if (in_array($column->type, $texttypes)) {
                         $columnname = $column->name;
                         $select = "$columnname $regexp ?";
-                        $rs = $DB->get_recordset_select($table, $select, [$search]);
+                        $rs = $DB->get_recordset_select($table, $select, [$httpurls]);
 
+                        $found = array();
                         foreach ($rs as $record) {
                             // Regex to match src=http://etc. and data=http://etc.urls.
                             // Standard warning on expecting regex to perfectly parse HTML
@@ -92,19 +102,43 @@ class url_finder {
                                 if (strpos($url, $CFG->wwwroot) === true) {
                                     continue;
                                 }
-                                $entry["table"] = $table;
-                                $entry["columnname"] = $columnname;
-                                $entry["url"] = str_replace(array("'", '"'), "", substr($url, ((int) strpos($url, "=") + 1) ));
-                                $entry["host"] = parse_url($entry["url"], PHP_URL_HOST);
-                                $entry["raw"] = $record->$columnname;
-                                $entry["ssl"] = '';
-                                $urls[] = $entry;
+                                if ($replacing) {
+                                    $url = substr($url, strpos($url, 'http'), -1);
+                                    $host = parse_url($url, PHP_URL_HOST);
+                                    $found[] = $host;
+                                } else {
+                                    $entry["table"] = $table;
+                                    $entry["columnname"] = $columnname;
+                                    $entry["url"] = str_replace(array("'", '"'), "", substr($url, ((int) strpos($url, "=") + 1) ));
+                                    $entry["host"] = parse_url($entry["url"], PHP_URL_HOST);
+                                    $entry["raw"] = $record->$columnname;
+                                    $entry["ssl"] = '';
+                                    $urls[] = $entry;
+                                }
                             }
                         }
                         $rs->close();
+
+                        if ($replacing) {
+                            $found = array_unique($found);
+                            foreach ($found as $domain) {
+                                $search = "http://$domain";
+                                $replace = "https://$domain";
+                                $DB->set_debug(true);
+                                // Note, this search is case sensitive.
+                                $DB->replace_all_text($table, $column, $search, $replace);
+                                $DB->set_debug(false);
+                            }
+                        }
                     }
                 }
             }
+        }
+
+        if ($replacing) {
+            rebuild_course_cache(0, true);
+            purge_all_caches();
+            return true;
         }
 
         $domains = array_map(function ($i) {

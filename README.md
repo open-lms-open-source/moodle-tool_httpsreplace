@@ -3,4 +3,6 @@ dedicated to bringing excellent online teaching to institutions across the globe
 schools and organizations by supporting the software that educators use to manage and deliver instructional content to
 learners in virtual classrooms.  Moodlerooms is headquartered in Baltimore, MD.  We are proud to be a Moodle Partner company.
 
-For more information about installation, configuration and usage, please see https://docs.moodle.org/30/en/admin/tool/httpsreplace/index
+For more information about installation, configuration and usage, please see [the wiki page]
+
+[the wiki page]: <https://docs.moodle.org/30/en/admin/tool/httpsreplace/index>

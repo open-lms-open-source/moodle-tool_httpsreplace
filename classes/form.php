@@ -22,6 +22,8 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
+namespace tool_httpsreplace;
+
 defined('MOODLE_INTERNAL') || die();
 
 require_once("$CFG->libdir/formslib.php");
@@ -29,7 +31,7 @@ require_once("$CFG->libdir/formslib.php");
 /**
  * Site wide http -> https search-replace form.
  */
-class tool_httpsreplace_form extends moodleform {
+class form extends \moodleform {
 
     public function definition() {
         global $CFG, $DB;
