@@ -99,7 +99,7 @@ class url_finder {
                             $regex = '#(src|data)\ *=\ *[\'\"]http://[^\s()<>]+(?:\([\w\d]+\)|([^[:punct:]\s]|/))[\'\"]#';
                             preg_match_all($regex, $record->$columnname, $match);
                             foreach ($match[0] as $url) {
-                                if (strpos($url, $CFG->wwwroot) === true) {
+                                if (strpos($url, $CFG->wwwroot) !== false) {
                                     continue;
                                 }
                                 if ($replacing) {
