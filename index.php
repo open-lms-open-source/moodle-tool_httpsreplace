@@ -66,7 +66,8 @@ if (!$data = $form->get_data()) {
         );
         $data = array();
         foreach ($results as $domain => $count) {
-            $data[] = [$domain, $count];
+            $cleandomain = format_text($domain, FORMAT_PLAIN);
+            $data[] = [$cleandomain, $count];
         }
         $table->data = $data;
         echo html_writer::table($table);

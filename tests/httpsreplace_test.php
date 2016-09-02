@@ -17,7 +17,7 @@
 /**
  * HTTPS find and replace Tests
  *
- * @package   theme_snap
+ * @package   tool_httpsreplace
  * @copyright Copyright (c) 2015 Moodlerooms Inc. (http://www.moodlerooms.com)
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
@@ -27,11 +27,6 @@ namespace tool_httpsreplace\tests;
 
 defined('MOODLE_INTERNAL') || die();
 
-/**
- * @package   theme_snap
- * @copyright Copyright (c) 2015 Moodlerooms Inc. (http://www.moodlerooms.com)
- * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
- */
 class httpsreplace_test extends \advanced_testcase {
 
     public function test_find_and_replace() {
