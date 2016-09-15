@@ -18,7 +18,7 @@
  * Search and replace http -> https throughout all texts in the whole database
  *
  * @package    tool_httpsreplace
- * @copyright Copyright (c) 2016 Moodlerooms Inc. (http://www.moodlerooms.com)
+ * @copyright Copyright (c) 2016 Blackboard Inc. (http://www.blackboard.com)
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 

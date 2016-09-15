@@ -21,7 +21,7 @@ namespace tool_httpsreplace;
  * when embedded in HTTPS sites.
  *
  * @package tool_httpsreplace
- * @copyright Copyright (c) 2016 Moodlerooms Inc. (http://www.moodlerooms.com)
+ * @copyright Copyright (c) 2016 Blackboard Inc. (http://www.blackboard.com)
  */
 class url_finder {
 

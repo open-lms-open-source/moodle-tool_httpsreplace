@@ -18,7 +18,7 @@
  * Site wide http -> https search-replace form.
  *
  * @package    tool_httpsreplace
- * @copyright Copyright (c) 2016 Moodlerooms Inc. (http://www.moodlerooms.com)
+ * @copyright Copyright (c) 2016 Blackboard Inc. (http://www.blackboard.com)
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
@@ -34,8 +34,6 @@ require_once("$CFG->libdir/formslib.php");
 class form extends \moodleform {
 
     public function definition() {
-        global $CFG, $DB;
-
         $mform = $this->_form;
 
         $mform->addElement('header', 'confirmhdr', get_string('confirm'));
