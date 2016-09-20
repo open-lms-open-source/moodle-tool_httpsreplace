@@ -33,6 +33,7 @@ class httpsreplace_test extends \advanced_testcase {
         global $DB;
 
         $this->resetAfterTest();
+        $this->expectOutputRegex("/UPDATE/");
 
         $finder = new \tool_httpsreplace\url_finder();
         $results = $finder->http_link_stats();
