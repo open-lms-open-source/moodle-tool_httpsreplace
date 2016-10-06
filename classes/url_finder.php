@@ -16,6 +16,8 @@
 
 namespace tool_httpsreplace;
 
+defined('MOODLE_INTERNAL') || die();
+
 /**
  * Examines DB for non-https src or data links that will cause trouble
  * when embedded in HTTPS sites.
