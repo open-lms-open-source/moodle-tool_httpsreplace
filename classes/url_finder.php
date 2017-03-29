@@ -27,8 +27,15 @@ defined('MOODLE_INTERNAL') || die();
  */
 class url_finder {
 
-    private $exceptions = array();
-
+    /**
+     * Domains that need replaced when using https links.
+     *
+     * @var array
+     * @access private
+     */
+    private $exceptions = [
+        'cdnapi.kaltura.com' => 'cdnapisec.kaltura.com',
+    ];
 
     public function http_link_stats() {
         return $this->process(false);
@@ -38,14 +45,18 @@ class url_finder {
         return $this->process(true);
     }
 
+    /**
+     * Replace http domains with https equivalent, with two types of exceptions
+     * for less straightforward swaps.
+     *
+     * @param string $table
+     * @param string $column
+     * @param string $domain
+     * @access private
+     * @return void
+     */
     private function domain_swap($table, $column, $domain) {
         global $DB;
-
-        if (!$this->exceptions) {
-            $this->exceptions = [
-                'cdnapi.kaltura.com' => 'cdnapisec.kaltura.com',
-            ];
-        }
 
         $search = "http://$domain";
         $replace = "https://$domain";
@@ -64,6 +75,7 @@ class url_finder {
         $DB->replace_all_text($table, $column, $search, $replace);
         $DB->set_debug(false);
     }
+
     /**
      * Originally forked from core function db_search().
      */
@@ -180,6 +192,7 @@ class url_finder {
             'dropbox.com',
             'www.dropbox.com',
             'cdnapi.kaltura.com',
+            'fe8be92ac963979368eca.r38.cf1.rackcdn.com', // Not actually a real domain, but used for testing.
         );
 
         foreach ($uniquedomains as $domain) {
