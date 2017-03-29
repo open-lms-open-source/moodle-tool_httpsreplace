@@ -27,6 +27,9 @@ defined('MOODLE_INTERNAL') || die();
  */
 class url_finder {
 
+    private $exceptions = array();
+
+
     public function http_link_stats() {
         return $this->process(false);
     }
@@ -35,6 +38,32 @@ class url_finder {
         return $this->process(true);
     }
 
+    private function domain_swap($table, $column, $domain) {
+        global $DB;
+
+        if (!$this->exceptions) {
+            $this->exceptions = [
+                'cdnapi.kaltura.com' => 'cdnapisec.kaltura.com',
+            ];
+        }
+
+        $search = "http://$domain";
+        $replace = "https://$domain";
+        if (isset($this->exceptions[$domain])) {
+            $replace = 'https://' . $this->exceptions[$domain];
+        }
+        if (preg_match('/rackcdn.com$/', $domain)) {
+            // Regexes adapted from
+            // https://www.eff.org/https-everywhere/atlas/domains/rackcdn.com.html ruleset.
+            $pattern = '/^([\w-]+)\.(?:r\d+|ssl)\.cf(\d)\.rackcdn\.com$/';
+            $replacement = 'https://$1.ssl.cf$2.rackcdn.com';
+            $replace = preg_replace($pattern, $replacement, $domain);
+        }
+        $DB->set_debug(true);
+        // Note, this search is case sensitive.
+        $DB->replace_all_text($table, $column, $search, $replace);
+        $DB->set_debug(false);
+    }
     /**
      * Originally forked from core function db_search().
      */
@@ -124,12 +153,7 @@ class url_finder {
                         if ($replacing) {
                             $found = array_unique($found);
                             foreach ($found as $domain) {
-                                $search = "http://$domain";
-                                $replace = "https://$domain";
-                                $DB->set_debug(true);
-                                // Note, this search is case sensitive.
-                                $DB->replace_all_text($table, $column, $search, $replace);
-                                $DB->set_debug(false);
+                                $this->domain_swap($table, $column, $domain);
                             }
                         }
                     }
@@ -155,6 +179,7 @@ class url_finder {
             'www.amazon.com',
             'dropbox.com',
             'www.dropbox.com',
+            'cdnapi.kaltura.com',
         );
 
         foreach ($uniquedomains as $domain) {
