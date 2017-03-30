@@ -55,6 +55,16 @@ class httpsreplace_test extends \advanced_testcase {
             'summary' => $imglink1.$imglink2.$imglink3,
         ]);
 
+        $kaltura = '<script src="http://cdnapi.kaltura.com/p/730212/sp/73021200/embedIframeJs">';
+        $course4 = $generator->create_course((object) [
+            'summary' => $kaltura,
+        ]);
+
+        $rackcdn = '<iframe src="http://fe8be92ac963979368eca.r38.cf1.rackcdn.com/Helpful_ET_Websites_Apps_Resources.pdf">';
+        $course5 = $generator->create_course((object) [
+            'summary' => $rackcdn,
+        ]);
+
         $results = $finder->http_link_stats();
         $this->assertCount(2, $results);
         $this->assertEquals(4, $results['intentionally.unavailable']);
@@ -77,6 +87,13 @@ class httpsreplace_test extends \advanced_testcase {
         $this->assertContains('https://other.unavailable', $summary3);
         $this->assertContains('https://intentionally.unavailable', $summary3);
         $this->assertNotContains('http://intentionally.unavailable', $summary3);
+
+        $summary4 = $DB->get_field('course', 'summary', ['id' => $course4->id]);
+        $this->assertContains('https://cdnapisec.kaltura.com', $summary4);
+
+        $summary5 = $DB->get_field('course', 'summary', ['id' => $course5->id]);
+        $expected = "https://fe8be92ac963979368eca.ssl.cf1.rackcdn.com/Helpful_ET_Websites_Apps_Resources.pdf";
+        $this->assertContains($expected, $summary5);
     }
 
     public function test_upgrade_http_links_excluded_tables() {
