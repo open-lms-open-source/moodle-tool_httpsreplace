@@ -1,0 +1,18 @@
+[
+  {
+    "name": "kaltura",
+    "target": "cdnapi.kaltura.com",
+    "rule": {
+      "from": "cdnapi.kaltura.com",
+      "to": "cdnapisec.kaltura.com"
+    }
+  },
+  {
+    "name": "rackcdn",
+    "target": "rackcdn.com",
+    "rule": {
+      "from": "^([\\w-]+)\\.(?:r\\d+|ssl)\\.cf(\\d)\\.rackcdn\\.com",
+      "to": "$1.ssl.cf$2.rackcdn.com"
+    }
+  }
+]

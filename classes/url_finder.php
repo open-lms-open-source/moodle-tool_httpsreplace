@@ -28,14 +28,12 @@ defined('MOODLE_INTERNAL') || die();
 class url_finder {
 
     /**
-     * Domains that need replaced when using https links.
+     * Array of objects defining the exceptions for HTTPS swap
      *
-     * @var array
+     * @var stdClass
      * @access private
      */
-    private $exceptions = [
-        'cdnapi.kaltura.com' => 'cdnapisec.kaltura.com',
-    ];
+    private $exceptionsobj;
 
     public function http_link_stats() {
         return $this->process(false);
@@ -46,44 +44,12 @@ class url_finder {
     }
 
     /**
-     * Replace http domains with https equivalent, with two types of exceptions
-     * for less straightforward swaps.
-     *
-     * @param string $table
-     * @param string $column
-     * @param string $domain
-     * @access private
-     * @return void
-     */
-    private function domain_swap($table, $column, $domain) {
-        global $DB;
-
-        $search = "http://$domain";
-        $replace = "https://$domain";
-        if (isset($this->exceptions[$domain])) {
-            $replace = 'https://' . $this->exceptions[$domain];
-        }
-        if (preg_match('/rackcdn.com$/', $domain)) {
-            // Regexes adapted from
-            // https://www.eff.org/https-everywhere/atlas/domains/rackcdn.com.html ruleset.
-            $pattern = '/^([\w-]+)\.(?:r\d+|ssl)\.cf(\d)\.rackcdn\.com$/';
-            $replacement = 'https://$1.ssl.cf$2.rackcdn.com';
-            $replace = preg_replace($pattern, $replacement, $domain);
-        }
-        $DB->set_debug(true);
-        // Note, this search is case sensitive.
-        $DB->replace_all_text($table, $column, $search, $replace);
-        $DB->set_debug(false);
-    }
-
-    /**
      * Originally forked from core function db_search().
      */
     private function process($replacing = false) {
         global $DB, $CFG;
-
         require_once($CFG->libdir.'/filelib.php');
-
+        self::load_exceptions();
         $httpurls  = "(src|data)\ *=\ *[\\\"\']http://";
 
         // TODO: block_instances have HTML content as base64, need to decode then
@@ -165,7 +131,7 @@ class url_finder {
                         if ($replacing) {
                             $found = array_unique($found);
                             foreach ($found as $domain) {
-                                $this->domain_swap($table, $column, $domain);
+                                $this->domain_swap_exceptions_file($table, $column, $domain);
                             }
                         }
                     }
@@ -224,4 +190,56 @@ class url_finder {
         return $results;
     }
 
+    /**
+     * swap the domain depending on exceptions object
+     * @param string $table
+     * @param stdClass $column
+     * @param string $domain
+     */
+    private function domain_swap_exceptions_file($table, $column, $domain) {
+        global $DB;
+        $search = "http://" . $domain;
+        $replace = "https://" . $domain;
+        foreach ($this->exceptionsobj as $exception) {
+            $target = "/" . $exception->target . "$/";
+            if (preg_match($target, $domain)) {
+                $pattern = "/" . $exception->rule->from . "$/";
+                $replacement = $exception->rule->to;
+                $replace = "https://" . preg_replace($pattern, $replacement, $domain);
+            }
+        }
+        $DB->set_debug(true);
+        // Note, this search is case sensitive.
+        $DB->replace_all_text($table, $column, $search, $replace);
+        $DB->set_debug(false);
+    }
+
+    /**
+     * Load exceptions from exceptions.json
+     * Exceptions are the rulesets for swapping from http to https
+     */
+    private function load_exceptions() {
+        global $CFG;
+        $filename = "exceptions.json";
+        $fileurl = $CFG->dirroot . '/admin/tool/httpsreplace/';
+        $exceptionsdata = self::load_data($fileurl, $filename);
+        $this->exceptionsobj = json_decode($exceptionsdata);
+    }
+
+    /**
+     * @param  string $rpath
+     * @param  string $name
+     * @return null|string
+     */
+    private static function load_data($rpath,  $name) {
+        $result = null;
+        $repath = realpath($rpath.$name);
+        if ($repath !== false) {
+            $lresult = file_get_contents($repath);
+            if ($lresult !== false) {
+                $result = $lresult;
+            }
+        }
+        return $result;
+    }
 }
